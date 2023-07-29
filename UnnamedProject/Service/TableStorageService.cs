@@ -26,7 +26,7 @@ namespace UnnamedProject
         public async Task<BnbExcangeRates> GetEntityAsync(DateTime date, string code)
         {
             var tableClient = await GetTableClient();
-            return await tableClient.GetEntityAsync<BnbExcangeRates>(date.ToString(), code);
+            return await tableClient.GetEntityAsync<BnbExcangeRates>(date.ToString("yyyyMMdd"), code);
         }
 
         public async Task<BnbExcangeRates> UpsertEntityAsync(BnbExcangeRates entity)
@@ -39,7 +39,7 @@ namespace UnnamedProject
         public async Task DeleteEntityAsync(DateTime date, string code)
         {
             var tableClient = await GetTableClient();
-            await tableClient.DeleteEntityAsync(date.ToString(), code);
+            await tableClient.DeleteEntityAsync(date.ToString("yyyyMMdd"), code);
         }
     }
 }

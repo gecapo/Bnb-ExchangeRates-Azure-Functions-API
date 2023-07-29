@@ -22,10 +22,13 @@ namespace UnnamedProject
         private readonly IMapper _mapper;
         private readonly ITableStorageService _tableStorageService;
 
-        public RatesGetAll(IBnbClientService bnbClient, IMapper mapper)
+        public RatesGetAll(IBnbClientService bnbClient,
+            IMapper mapper,
+            ITableStorageService tableStorageService)
         {
             _bnbClient = bnbClient;
             _mapper = mapper;
+            _tableStorageService = tableStorageService;
         }
 
         [FunctionName("RatesGetAll")]
@@ -39,9 +42,16 @@ namespace UnnamedProject
                 var rates = bnbExcangeRatesRespon.ExcangeRates
                     .Where(x => x.Indicator == "1")
                     .Where(x => x.Rate != "n/a")
+                    //.ProjectTo<BnbExcangeRates>()
                     .ToList();
 
-                return new OkObjectResult(_mapper.Map<IEnumerable<BnbExcangeRates>>(rates));
+                var result = _mapper.Map<IEnumerable<BnbExcangeRates>>(rates);
+
+                foreach (var rate in result)
+                   await _tableStorageService.UpsertEntityAsync(rate);
+
+
+                return new OkObjectResult(result);
             }
 
             return new OkObjectResult($"No rates for {date}");

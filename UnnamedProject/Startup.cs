@@ -15,7 +15,7 @@ namespace UnnamedProject
             //var apiKey = secretClient.GetSecret("").Value.Value;
 
             builder.Services.AddAutoMapper(typeof(MapProfile));
-            builder.Services.AddScoped(typeof(IBnbClientService), typeof(BnbClient));
+            builder.Services.AddScoped(typeof(IBnbClientService), typeof(BnbClientService));
             builder.Services.AddScoped(typeof(ITableStorageService), typeof(TableStorageService));
         }
     }

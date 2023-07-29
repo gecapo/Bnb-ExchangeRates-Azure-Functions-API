@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using Azure;
 using Azure.Data.Tables;
-using Microsoft.Extensions.Configuration;
 
 namespace UnnamedProject
 {
@@ -20,7 +19,4 @@ namespace UnnamedProject
         public DateTimeOffset? Timestamp { get; set; }
         public ETag ETag { get; set; }
     }
-
-
 }
-
