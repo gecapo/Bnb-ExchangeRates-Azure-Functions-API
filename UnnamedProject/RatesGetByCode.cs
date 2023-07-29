@@ -7,45 +7,43 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using System.Globalization;
-using System.Xml.Linq;
-using Azure;
 using System.Linq;
+using System.Xml.Linq;
 using AutoMapper;
 using System.Collections.Generic;
+using Azure.Data.Tables;
+using Microsoft.WindowsAzure.Storage;
 
 namespace UnnamedProject
 {
-    public class RatesGetAll
+    public class RatesGetByCode
     {
         private readonly IBnbClientService _bnbClient;
         private readonly IMapper _mapper;
-        private readonly ITableStorageService _tableStorageService;
 
-        public RatesGetAll(IBnbClientService bnbClient, IMapper mapper)
+        public RatesGetByCode(IBnbClientService bnbClient, IMapper mapper)
         {
             _bnbClient = bnbClient;
             _mapper = mapper;
         }
 
-        [FunctionName("RatesGetAll")]
+        [FunctionName("RatesGetByCode")]
         public async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "rates/{date}")] HttpRequest req, DateTime date)
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "rates/{date}/{code:alpha:maxlength(3):minlength(3)}")] HttpRequest req, DateTime date, string code)
         {
             var response = await _bnbClient.GetExchangeRates(date);
             if (XElementExtensions.TryParse(response, out XElement xml))
             {
                 var bnbExcangeRatesRespon = XElementExtensions.Deserialize<BnbExcangeRatesResponseRoot>(xml.ToString());
-                var rates = bnbExcangeRatesRespon.ExcangeRates
+                var rate = bnbExcangeRatesRespon.ExcangeRates
                     .Where(x => x.Indicator == "1")
                     .Where(x => x.Rate != "n/a")
-                    .ToList();
+                    .FirstOrDefault(x => x.Code.ToLowerInvariant() == code.ToLowerInvariant());
 
-                return new OkObjectResult(_mapper.Map<IEnumerable<BnbExcangeRates>>(rates));
+                return new OkObjectResult(_mapper.Map<BnbExcangeRates>(rate));
             }
 
             return new OkObjectResult($"No rates for {date}");
         }
     }
 }
-

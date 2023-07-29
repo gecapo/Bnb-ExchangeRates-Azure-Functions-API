@@ -11,10 +11,12 @@ namespace UnnamedProject
         public override void Configure(IFunctionsHostBuilder builder)
         {
             var keyValutUrl = new Uri(Environment.GetEnvironmentVariable("KeyValutUrl"));
-            builder.Services.AddAutoMapper(typeof(MapProfile));
-            builder.Services.AddTransient(typeof(IBnbClient), typeof(BnbClient));
             //var secretClient = new SecretClient(keyValutUrl, new DefaultAzureCredential());
             //var apiKey = secretClient.GetSecret("").Value.Value;
+
+            builder.Services.AddAutoMapper(typeof(MapProfile));
+            builder.Services.AddScoped(typeof(IBnbClientService), typeof(BnbClient));
+            builder.Services.AddScoped(typeof(ITableStorageService), typeof(TableStorageService));
         }
     }
 }

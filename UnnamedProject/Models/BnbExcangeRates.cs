@@ -1,8 +1,12 @@
 ﻿using System;
+using System.Threading.Tasks;
+using Azure;
+using Azure.Data.Tables;
+using Microsoft.Extensions.Configuration;
 
 namespace UnnamedProject
 {
-    public class BnbExcangeRates
+    public class BnbExcangeRates : ITableEntity
     {
         public DateTime ReportDate { get; set; }
         public string CurrencyName { get; set; }
@@ -10,6 +14,13 @@ namespace UnnamedProject
         public int Ratio { get; set; }
         public decimal ReverseRate { get; set; }
         public decimal Rate { get; set; }
+
+        public string PartitionKey { get; set; }
+        public string RowKey { get; set; }
+        public DateTimeOffset? Timestamp { get; set; }
+        public ETag ETag { get; set; }
     }
+
+
 }
 
