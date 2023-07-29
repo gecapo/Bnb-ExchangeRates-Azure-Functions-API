@@ -3,9 +3,8 @@ using System.Threading.Tasks;
 
 namespace UnnamedProject
 {
-    public interface IBnbClient
+    public interface IBnbClientService
     {
         Task<string> GetExchangeRates(DateTime dateTime);
     }
 }
-

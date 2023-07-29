@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace UnnamedProject
 {
-    public class BnbClient : IBnbClient
+    public class BnbClientService : IBnbClientService
     {
         private readonly string _bnbUrl = "https://www.bnb.bg";
 
@@ -32,4 +32,3 @@ namespace UnnamedProject
         }
     }
 }
-
