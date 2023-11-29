@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Xml.Serialization;
-using Azure.Identity;
-using Azure.Security.KeyVault.Secrets;
 
 namespace UnnamedProject
 {

@@ -1,15 +1,10 @@
 ﻿using System;
-using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using System.Globalization;
 using System.Xml.Linq;
-using Azure;
 using System.Linq;
 using AutoMapper;
 using System.Collections.Generic;
@@ -36,25 +31,20 @@ namespace UnnamedProject
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "rates/{date}")] HttpRequest req, DateTime date)
         {
             var response = await _bnbClient.GetExchangeRates(date);
-            if (XElementExtensions.TryParse(response, out XElement xml))
-            {
-                var bnbExcangeRatesRespon = XElementExtensions.Deserialize<BnbExcangeRatesResponseRoot>(xml.ToString());
-                var rates = bnbExcangeRatesRespon.ExcangeRates
-                    .Where(x => x.Indicator == "1")
-                    .Where(x => x.Rate != "n/a")
-                    //.ProjectTo<BnbExcangeRates>()
-                    .ToList();
+            if (!XElementExtensions.TryParse(response, out XElement xml))
+                return new OkObjectResult($"No rates for {date}");
 
-                var result = _mapper.Map<IEnumerable<BnbExcangeRates>>(rates);
+            var bnbExcangeRatesResponseDto = XElementExtensions.Deserialize<BnbExcangeRatesResponseRoot>(xml.ToString());
+            var ratesDto = bnbExcangeRatesResponseDto.ExcangeRates
+                .Where(x => x.Indicator == "1")
+                .Where(x => x.Rate != "n/a")
+                .ToList();
 
-                foreach (var rate in result)
-                   await _tableStorageService.UpsertEntityAsync(rate);
+            var rates = _mapper.Map<IEnumerable<BnbExcangeRates>>(ratesDto);
+            foreach (var rate in rates)
+                await _tableStorageService.UpsertEntityAsync(rate);
 
-
-                return new OkObjectResult(result);
-            }
-
-            return new OkObjectResult($"No rates for {date}");
+            return new OkObjectResult(rates);
         }
     }
 }
